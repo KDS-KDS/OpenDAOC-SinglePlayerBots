@@ -289,14 +289,12 @@ namespace DOL.GS
             
         }
 
-        public static DbItemUnique GenerateBeadOfRegeneration()
+        public static DbItemTemplate GenerateBeadOfRegeneration()
         {
             if(beadTemplate == null)
                 beadTemplate = GameServer.Database.FindObjectByKey<DbItemTemplate>("Bead_Of_Regeneration");
-            
-            DbItemUnique item = new DbItemUnique(beadTemplate);
-            
-            return item;
+
+            return beadTemplate;
         }
     }
 }

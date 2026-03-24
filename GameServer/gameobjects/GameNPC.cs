@@ -2896,6 +2896,7 @@ namespace DOL.GS
                     if (killer is GameNPC pet && pet.Brain is IControlledBrain petBrain)
                         killer = petBrain.GetLivingOwner();
 
+                    if (log.IsDebugEnabled) log.Debug($"[LOOT DEBUG] {Name} killed by {killer?.Name} ({killer?.GetType().Name}), IsWorthReward={IsWorthReward}");
                     Diagnostics.StartPerfCounter($"ReaperService-NPC-ProcessDeath-DropLoot-NPC({hashCode})");
 
                     if (IsWorthReward)

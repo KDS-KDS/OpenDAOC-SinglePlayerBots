@@ -18,7 +18,7 @@ RUN apt-get update && \
 
 # Combine the SQL files
 WORKDIR /tmp/opendaoc-db/opendaoc-db-core
-RUN cat *.sql > combined.sql
+RUN cat *.sql > combined.sql && cat /build/db-patches/*.sql >> combined.sql
 
 # Set the working directory back to the build container
 WORKDIR /build

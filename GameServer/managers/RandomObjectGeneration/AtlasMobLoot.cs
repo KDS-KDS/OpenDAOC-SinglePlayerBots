@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DOL.Database;
+using DOL.GS.Scripts;
+using log4net;
 
 namespace DOL.GS {
 
@@ -11,6 +13,8 @@ namespace DOL.GS {
     /// At the moment this generator only adds ROGs to the loot
     /// </summary>
     public class ROGMobGenerator : LootGeneratorBase {
+
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         //base chance in %
         public static ushort BASE_ROG_CHANCE = 14;
@@ -36,6 +40,7 @@ namespace DOL.GS {
 
                 if (player == null)
                 {
+                    if (log.IsDebugEnabled) log.Debug($"[ROG DEBUG] killer={killer?.Name} ({killer?.GetType().Name}) -> player is null, no loot");
                     return loot;
                 }
 
@@ -44,6 +49,7 @@ namespace DOL.GS {
                 //grey con dont drop loot
                 if (killedcon <= -3)
                 {
+                    if (log.IsDebugEnabled) log.Debug($"[ROG DEBUG] {mob.Name} is grey con ({killedcon}) to {player.Name}, no loot");
                     return loot;
                 }
 
@@ -52,6 +58,7 @@ namespace DOL.GS {
                 if (player.Group != null)
                 {
                     player = player.Group.Leader;
+                    if (log.IsDebugEnabled) log.Debug($"[ROG DEBUG] Group leader={player?.Name} ({player?.GetType().Name}), con={killedcon}, mob={mob.Name}");
                 }
 
                 // chance to get a RoG Item
@@ -101,6 +108,8 @@ namespace DOL.GS {
                         chance -= 3;
 
                     int numDrops = 0;
+                    int nearbyPlayers = player.Group.GetNearbyPlayersInTheGroup(player).Count;
+                    if (log.IsDebugEnabled) log.Debug($"[ROG DEBUG] Group path: chance={chance}%, MaxDropCap={MaxDropCap}, nearbyPlayers={nearbyPlayers}, groupSize={player.Group.MemberCount}");
                     //roll for an item for each player in the group
                     foreach (var groupPlayer in player.Group.GetNearbyPlayersInTheGroup(player))
                     {
@@ -127,7 +136,7 @@ namespace DOL.GS {
                     if(player.Level < 50 || mob.Level < 50)
                     {
                         var item = AtlasROGManager.GenerateBeadOfRegeneration();
-                        loot.AddRandom(2, item, 1);
+                        if (item != null) loot.AddRandom(2, item, 1);
                     }
                     //classForLoot = GetRandomClassFromGroup(player.Group);
                     //chance += 4 * player.Group.GetPlayersInTheGroup().Count; //4% extra drop chance per group member
@@ -169,7 +178,7 @@ namespace DOL.GS {
                     if(player.Level < 50 || mob.Level < 50)
                     {
                         item = AtlasROGManager.GenerateBeadOfRegeneration();
-                        loot.AddRandom(2, item, 1);
+                        if (item != null) loot.AddRandom(2, item, 1);
                     }
                 }
 
@@ -178,8 +187,9 @@ namespace DOL.GS {
                
 
             }
-            catch
+            catch (Exception ex)
             {
+                log.Error($"[ROG DEBUG] Exception in GenerateLoot for {mob?.Name}: {ex}");
                 return loot;
             }
 
@@ -205,10 +215,15 @@ namespace DOL.GS {
         {
             List<eCharacterClass> validClasses = new List<eCharacterClass>();
 
-            foreach (GamePlayer player in group.GetMembersInTheGroup())
+            foreach (GameLiving member in group.GetMembersInTheGroup())
             {
-                validClasses.Add((eCharacterClass)player.CharacterClass.ID);
+                if (member is IGamePlayer gamePlayer)
+                    validClasses.Add((eCharacterClass)gamePlayer.CharacterClass.ID);
             }
+
+            if (validClasses.Count == 0)
+                return eCharacterClass.Unknown;
+
             eCharacterClass ranClass = validClasses[Util.Random(validClasses.Count - 1)];
 
             return ranClass;

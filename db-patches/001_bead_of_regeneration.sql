@@ -1,0 +1,2 @@
+INSERT IGNORE INTO `itemtemplate` (`ItemTemplate_ID`, `Id_nb`, `Name`, `Level`, `Model`, `Object_Type`, `Item_Type`, `Weight`, `Quality`, `Condition`, `MaxCondition`, `Durability`, `MaxDurability`, `IsPickable`, `IsDropable`, `CanDropAsLoot`, `MaxCount`, `PackSize`, `SpellID`, `Charges`, `MaxCharges`, `Description`)
+VALUES ('Bead_Of_Regeneration', 'Bead_Of_Regeneration', 'Bead of Regeneration', 1, 118, 41, 40, 1, 100, 50000, 50000, 50000, 50000, 1, 1, 1, 1, 1, 31026, 10, 10, 'A small bead that pulses with restorative energy.');
