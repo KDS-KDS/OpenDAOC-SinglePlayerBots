@@ -281,6 +281,30 @@ namespace DOL.GS.Scripts
                                 case eSpellType.CureDisease: AlreadyCastingCureDisease = true; break;
                                 case eSpellType.CurePoison: AlreadyCastingCurePoison = true; break;
                             }
+
+                        // Check group member's pet health
+                        if (groupMember.ControlledBrain?.Body is GameLiving pet && pet.IsAlive)
+                        {
+                            m_percentCurrent = pet.HealthPercent;
+
+                            if (m_percentCurrent < 100)
+                            {
+                                if (m_percentCurrent < EmergencyThreshold)
+                                    NumNeedEmergencyHealing++;
+                                else if (m_percentCurrent < HealThreshold)
+                                    NumNeedHealing++;
+                                else
+                                    NumInjured++;
+
+                                AmountToHeal += pet.MaxHealth - pet.Health;
+                            }
+
+                            if (m_percentCurrent < m_healthPercent)
+                            {
+                                m_healthPercent = m_percentCurrent;
+                                MemberToHeal = pet;
+                            }
+                        }
                     }
                 }
 

@@ -2742,6 +2742,24 @@ namespace DOL.AI.Brain
                                     }
                                 }
                             }
+
+                            // Buff group member pets
+                            if (target == null && spell.Target != eSpellTarget.SELF)
+                            {
+                                foreach (GameLiving groupMember in Body.Group.GetMembersInTheGroup())
+                                {
+                                    if (groupMember != Body
+                                        && groupMember.ControlledBrain?.Body is GameLiving pet
+                                        && pet.IsAlive
+                                        && Body.GetDistanceTo(pet) <= spell.Range
+                                        && !LivingHasEffect(pet, spell)
+                                        && !Body.attackComponent.AttackState)
+                                    {
+                                        target = pet;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
 

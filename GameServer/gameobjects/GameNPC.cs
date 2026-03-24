@@ -2896,6 +2896,10 @@ namespace DOL.GS
                     if (killer is GameNPC pet && pet.Brain is IControlledBrain petBrain)
                         killer = petBrain.GetLivingOwner();
 
+
+                    // If a mimic got the kill, resolve to the group's player leader for loot purposes
+                    if (killer is MimicNPC mimic && mimic.Group?.LivingLeader is GamePlayer playerLeader)
+                        killer = playerLeader;
                     Diagnostics.StartPerfCounter($"ReaperService-NPC-ProcessDeath-DropLoot-NPC({hashCode})");
 
                     if (IsWorthReward)
